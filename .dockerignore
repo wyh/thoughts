@@ -1,0 +1,46 @@
+# Git 相关
+.git
+.gitignore
+.gitmodules
+
+# Hugo 构建输出
+public/
+resources/_gen/
+
+# 依赖和缓存
+node_modules/
+.hugo_build.lock
+
+# IDE 和编辑器
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Docker 相关
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# Kubernetes
+k8s/
+
+# 脚本
+scripts/
+
+# 文档
+README.md
+WRITING_GUIDE.md
+LICENSE
+
+# 其他
+*.log
+tmp/
+temp/
+

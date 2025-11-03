@@ -1,0 +1,53 @@
+baseURL = 'https://example.org/'
+languageCode = 'zh-cn'
+title = 'Thoughts'
+theme = 'PaperMod'
+
+# 摘要设置
+summaryLength = 70
+hasCJKLanguage = true
+
+# Markdown 渲染配置
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+  [markup.highlight]
+    codeFences = true
+    guessSyntax = true
+    lineNos = false
+    style = "monokai"
+
+[params]
+  description = "Thoughts on Software Engineering, Science and Life"
+  author = "Ivy"
+  
+  # PaperMod specific settings
+  ShowReadingTime = true
+  ShowShareButtons = true
+  ShowPostNavLinks = true
+  ShowBreadCrumbs = true
+  ShowCodeCopyButtons = true
+  ShowWordCount = true
+  ShowRssButtonInSectionTermList = true
+  
+[[params.socialIcons]]
+  name = "github"
+  url = "https://github.com"
+
+[menu]
+  [[menu.main]]
+    identifier = "posts"
+    name = "文章"
+    url = "/posts/"
+    weight = 10
+  [[menu.main]]
+    identifier = "tags"
+    name = "标签"
+    url = "/tags/"
+    weight = 20
+  [[menu.main]]
+    identifier = "archives"
+    name = "归档"
+    url = "/archives/"
+    weight = 30

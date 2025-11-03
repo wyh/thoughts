@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ivy-thoughts
+  labels:
+    app: ivy-thoughts
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ivy-thoughts
+  template:
+    metadata:
+      labels:
+        app: ivy-thoughts
+    spec:
+      containers:
+        - name: ivy-thoughts
+          # 开发环境：使用 latest，自动获取最新版本
+          # 生产环境：使用具体版本号，如 ghcr.io/wyh/ivy-thoughts:1.0.0
+          image: ghcr.io/wyh/ivy-thoughts:latest
+          imagePullPolicy: Always # 开发环境每次都拉取最新镜像
+          ports:
+            - containerPort: 80
+              name: http
+              protocol: TCP
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5
