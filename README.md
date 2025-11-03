@@ -101,9 +101,12 @@ docker-compose down
 
 1. ✅ 构建 Docker 镜像
 2. ✅ 推送到 GitHub Container Registry
-3. ✅ **自动部署到 Kubernetes**（需要配置 K8S_TOKEN）
+3. ✅ **自动部署到 Kubernetes**（需要配置 K8S_SERVER 和 K8S_TOKEN）
 
-📖 配置自动部署：查看 [.github/K8S_SECRETS_SETUP.md](.github/K8S_SECRETS_SETUP.md)
+📖 配置自动部署：
+
+- **快速开始（5 分钟）**: [.github/QUICK_START.md](.github/QUICK_START.md) ⭐
+- 详细配置指南: [.github/K8S_SECRETS_SETUP.md](.github/K8S_SECRETS_SETUP.md)
 
 ### 手动推送
 
@@ -166,13 +169,13 @@ curl http://ivy-thoughts
 ├── .github/
 │   ├── workflows/
 │   │   └── docker-publish.yml  # GitHub Actions 工作流（构建+部署）
-│   └── K8S_SECRETS_SETUP.md    # K8s 自动部署配置指南
+│   ├── QUICK_START.md          # 快速开始（5 分钟配置）
+│   └── K8S_SECRETS_SETUP.md    # K8s 详细配置指南
 ├── archetypes/                 # 文章模板
 ├── content/                    # 博客内容
 │   └── posts/                  # 文章目录
 ├── k8s/                        # Kubernetes 部署配置
-│   ├── deployment.yaml         # K8s Deployment（开发环境）
-│   ├── deployment-prod.yaml    # K8s Deployment（生产环境）
+│   ├── deployment.yaml         # K8s Deployment
 │   ├── service.yaml            # K8s Service
 │   ├── kustomization.yaml      # Kustomize 配置
 │   └── README.md               # K8s 部署文档

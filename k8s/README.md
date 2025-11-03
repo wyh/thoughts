@@ -18,14 +18,7 @@
 
 ## 配置步骤
 
-### 1. 选择部署环境
-
-项目提供两个部署配置：
-
-- **`deployment.yaml`** - 开发/测试环境，使用 `latest` tag，自动更新
-- **`deployment-prod.yaml`** - 生产环境，使用固定版本号，稳定可控
-
-### 2. 调整资源限制（可选）
+### 1. 调整资源限制（可选）
 
 根据实际需求修改 `k8s/deployment.yaml` 中的资源配置：
 
@@ -44,12 +37,8 @@ resources:
 ### 方法 1: 使用 kubectl 直接部署
 
 ```bash
-# 开发环境（使用 latest tag）
+# 部署应用
 kubectl apply -f k8s/deployment.yaml
-kubectl apply -f k8s/service.yaml
-
-# 生产环境（使用固定版本）
-kubectl apply -f k8s/deployment-prod.yaml
 kubectl apply -f k8s/service.yaml
 
 # 查看部署状态

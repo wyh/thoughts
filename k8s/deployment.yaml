@@ -16,10 +16,8 @@ spec:
     spec:
       containers:
         - name: ivy-thoughts
-          # 开发环境：使用 latest，自动获取最新版本
-          # 生产环境：使用具体版本号，如 ghcr.io/wyh/ivy-thoughts:1.0.0
           image: ghcr.io/wyh/ivy-thoughts:latest
-          imagePullPolicy: Always # 开发环境每次都拉取最新镜像
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
               name: http

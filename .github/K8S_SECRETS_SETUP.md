@@ -50,37 +50,67 @@ EOF
 kubectl get secret github-actions-token -o jsonpath='{.data.token}' | base64 -d
 ```
 
-#### 3. 在 GitHub 添加 Secrets
+### 3. 在 GitHub 添加 Secrets
 
 添加两个 secrets：
 
-1. **K8S_SERVER**
+#### 添加 K8S_SERVER
 
-   - 名称: `K8S_SERVER`
-   - 值: K8s API Server 地址，如 `https://k8s.example.com:6443`
+1. 进入你的 GitHub 仓库
+2. 点击 **Settings** → **Secrets and variables** → **Actions**
+3. 点击 **New repository secret**
+4. 名称: `K8S_SERVER`
+5. 值: 你的 K8s API Server 地址，例如 `https://k8s.example.com:6443`
+6. 点击 **Add secret**
 
-2. **K8S_TOKEN**
-   - 名称: `K8S_TOKEN`
-   - 值: ServiceAccount 的 Token
+#### 添加 K8S_TOKEN
 
-#### 4. 修改 workflow 配置
+1. 点击 **New repository secret**
+2. 名称: `K8S_TOKEN`
+3. 值: 粘贴上面获取的 ServiceAccount Token（**不需要** base64 编码）
+4. 点击 **Add secret**
 
-如果使用方法 2，需要在 `.github/workflows/docker-publish.yml` 中取消注释相关代码：
+### 4. 完成！
+
+配置完成后，workflow 会自动使用这两个 secrets 连接到你的 K8s 集群。
+
+---
+
+## 📝 替代方法：使用完整的 kubeconfig 文件
+
+如果你更喜欢使用完整的 kubeconfig 文件，可以使用以下方式：
+
+<details>
+<summary>点击展开查看 kubeconfig 方式配置</summary>
+
+### 获取并配置 kubeconfig
+
+```bash
+# 1. 查看你的 kubeconfig 文件
+cat ~/.kube/config
+
+# 2. Base64 编码
+cat ~/.kube/config | base64 -w 0
+```
+
+### 在 GitHub 添加 Secret
+
+- 名称: `K8S_CONFIG`
+- 值: base64 编码后的 kubeconfig
+
+### 修改 workflow
+
+需要修改 `.github/workflows/docker-publish.yml` 中的配置步骤：
 
 ```yaml
 - name: Configure kubectl
   run: |
-    # 使用 server + token 方式
-    kubectl config set-cluster k8s-cluster \
-      --server=${{ secrets.K8S_SERVER }} \
-      --insecure-skip-tls-verify=true
-    kubectl config set-credentials github-actions \
-      --token=${{ secrets.K8S_TOKEN }}
-    kubectl config set-context default \
-      --cluster=k8s-cluster \
-      --user=github-actions
-    kubectl config use-context default
+    mkdir -p $HOME/.kube
+    echo "${{ secrets.K8S_CONFIG }}" | base64 -d > $HOME/.kube/config
+    chmod 600 $HOME/.kube/config
 ```
+
+</details>
 
 ## 🔒 安全建议
 
@@ -142,17 +172,29 @@ kubectl create rolebinding github-actions-deployer \
 
 ## ✅ 验证配置
 
-### 测试 Secret 是否正确
+### 测试配置是否正确
 
 ```bash
-# 1. 手动测试（本地）
-echo "YOUR_BASE64_TOKEN" | base64 -d > /tmp/kubeconfig
-export KUBECONFIG=/tmp/kubeconfig
+# 1. 手动测试连接
+kubectl config set-cluster test-cluster \
+  --server=YOUR_K8S_SERVER \
+  --insecure-skip-tls-verify=true
+
+kubectl config set-credentials test-user \
+  --token=YOUR_K8S_TOKEN
+
+kubectl config set-context test-context \
+  --cluster=test-cluster \
+  --user=test-user
+
+kubectl config use-context test-context
+
+# 2. 测试连接
 kubectl get nodes
 
-# 2. 测试权限
+# 3. 测试权限
 kubectl auth can-i update deployments
-kubectl auth can-i get pods
+kubectl auth can-i get pods -l app=ivy-thoughts
 ```
 
 ### 测试 GitHub Actions

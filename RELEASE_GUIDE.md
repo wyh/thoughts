@@ -30,13 +30,22 @@
 **快速配置：**
 
 ```bash
-# 1. 获取 kubeconfig 并 base64 编码
-cat ~/.kube/config | base64 -w 0
+# 1. 获取 K8s API Server 地址
+kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}'
 
-# 2. 在 GitHub 仓库添加 Secret
-# Settings → Secrets and variables → Actions → New repository secret
-# 名称: K8S_TOKEN
-# 值: 粘贴上面的 base64 字符串
+# 2. 创建 ServiceAccount 并获取 Token
+kubectl create serviceaccount github-actions
+kubectl create clusterrolebinding github-actions-deployer \
+  --clusterrole=cluster-admin \
+  --serviceaccount=default:github-actions
+
+# 获取 Token（Kubernetes 1.24+）
+kubectl create token github-actions --duration=87600h
+
+# 3. 在 GitHub 仓库添加两个 Secrets
+# Settings → Secrets and variables → Actions
+# - K8S_SERVER: API Server 地址（如 https://k8s.example.com:6443）
+# - K8S_TOKEN: 上面获取的 Token
 ```
 
 配置完成后，推送 tag 即可自动部署！
