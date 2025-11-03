@@ -24,16 +24,16 @@ kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}'
 ### 2. 创建 ServiceAccount 和获取 Token
 
 ```bash
-# 创建 ServiceAccount
-kubectl create serviceaccount github-actions
+# 创建 ServiceAccount（在 ivy namespace）
+kubectl create serviceaccount github-actions -n ivy
 
 # 创建 ClusterRoleBinding（给予部署权限）
 kubectl create clusterrolebinding github-actions-deployer \
   --clusterrole=cluster-admin \
-  --serviceaccount=default:github-actions
+  --serviceaccount=ivy:github-actions
 
 # 为 ServiceAccount 创建 Token（Kubernetes 1.24+）
-kubectl create token github-actions --duration=87600h
+kubectl create token github-actions -n ivy --duration=87600h
 
 # 或者创建永久 Secret（Kubernetes < 1.24）
 cat <<EOF | kubectl apply -f -

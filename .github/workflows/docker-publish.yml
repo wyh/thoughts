@@ -95,7 +95,7 @@ jobs:
           kubectl config set-context default \
             --cluster=k8s-cluster \
             --user=github-actions \
-            --namespace=default
+            --namespace=ivy
 
           kubectl config use-context default
 
@@ -107,17 +107,19 @@ jobs:
           # 更新 deployment 镜像
           kubectl set image deployment/ivy-thoughts \
             ivy-thoughts=${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }} \
+            -n ivy \
             --record
 
           # 等待部署完成
-          kubectl rollout status deployment/ivy-thoughts --timeout=5m
+          kubectl rollout status deployment/ivy-thoughts -n ivy --timeout=5m
 
           # 验证部署
-          kubectl get deployment ivy-thoughts
-          kubectl get pods -l app=ivy-thoughts
+          kubectl get deployment ivy-thoughts -n ivy
+          kubectl get pods -l app=ivy-thoughts -n ivy
 
       - name: Deployment summary
         if: success()
         run: |
           echo "✅ Successfully deployed version ${{ steps.version.outputs.version }} to Kubernetes"
+          echo "Namespace: ivy"
           echo "Image: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}"

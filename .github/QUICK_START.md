@@ -24,16 +24,16 @@ kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}'
 ### 2. 创建 ServiceAccount 并获取 Token
 
 ```bash
-# 创建 ServiceAccount
-kubectl create serviceaccount github-actions
+# 创建 ServiceAccount（在 ivy namespace）
+kubectl create serviceaccount github-actions -n ivy
 
 # 给予部署权限
 kubectl create clusterrolebinding github-actions-deployer \
   --clusterrole=cluster-admin \
-  --serviceaccount=default:github-actions
+  --serviceaccount=ivy:github-actions
 
 # 获取 Token（10 年有效期）
-kubectl create token github-actions --duration=87600h
+kubectl create token github-actions -n ivy --duration=87600h
 ```
 
 复制输出的 Token。
@@ -67,7 +67,7 @@ git push origin v0.0.1-test
 # 访问: https://github.com/YOUR_USERNAME/thoughts/actions
 
 # 验证部署
-kubectl get pods -l app=ivy-thoughts
+kubectl get pods -l app=ivy-thoughts -n ivy
 ```
 
 ## 🚀 日常使用
@@ -97,10 +97,10 @@ git push origin v1.0.0
 # 在 GitHub 查看
 # https://github.com/YOUR_USERNAME/thoughts/actions
 
-# 在 K8s 查看
-kubectl get deployment ivy-thoughts
-kubectl get pods -l app=ivy-thoughts
-kubectl rollout status deployment/ivy-thoughts
+# 在 K8s 查看（namespace: ivy）
+kubectl get deployment ivy-thoughts -n ivy
+kubectl get pods -l app=ivy-thoughts -n ivy
+kubectl rollout status deployment/ivy-thoughts -n ivy
 ```
 
 ## 🔍 常见问题

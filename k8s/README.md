@@ -37,23 +37,23 @@ resources:
 ### 方法 1: 使用 kubectl 直接部署
 
 ```bash
-# 部署应用
-kubectl apply -f k8s/deployment.yaml
-kubectl apply -f k8s/service.yaml
+# 部署应用（到 ivy namespace）
+kubectl apply -f k8s/deployment.yaml -n ivy
+kubectl apply -f k8s/service.yaml -n ivy
 
 # 查看部署状态
-kubectl get pods -l app=ivy-thoughts
-kubectl get svc ivy-thoughts
+kubectl get pods -l app=ivy-thoughts -n ivy
+kubectl get svc ivy-thoughts -n ivy
 ```
 
 ### 方法 2: 使用 Kustomize 部署
 
 ```bash
-# 部署
-kubectl apply -k k8s/
+# 部署（到 ivy namespace）
+kubectl apply -k k8s/ -n ivy
 
 # 查看资源
-kubectl get all -l project=ivy-thoughts
+kubectl get all -l project=ivy-thoughts -n ivy
 ```
 
 ## 访问服务
@@ -78,7 +78,7 @@ curl http://ivy-thoughts.default.svc.cluster.local
 
 ```bash
 # 转发到本地
-kubectl port-forward svc/ivy-thoughts 8080:80
+kubectl port-forward svc/ivy-thoughts 8080:80 -n ivy
 
 # 访问
 curl http://localhost:8080
@@ -94,33 +94,34 @@ kubectl apply -f k8s/deployment.yaml
 
 # 方法 2: 直接设置新镜像
 kubectl set image deployment/ivy-thoughts \
-  ivy-thoughts=ghcr.io/<your-username>/ivy-thoughts:v2.0.0
+  ivy-thoughts=ghcr.io/<your-username>/ivy-thoughts:v2.0.0 \
+  -n ivy
 
 # 查看滚动更新状态
-kubectl rollout status deployment/ivy-thoughts
+kubectl rollout status deployment/ivy-thoughts -n ivy
 ```
 
 ### 回滚
 
 ```bash
 # 查看历史版本
-kubectl rollout history deployment/ivy-thoughts
+kubectl rollout history deployment/ivy-thoughts -n ivy
 
 # 回滚到上一个版本
-kubectl rollout undo deployment/ivy-thoughts
+kubectl rollout undo deployment/ivy-thoughts -n ivy
 
 # 回滚到指定版本
-kubectl rollout undo deployment/ivy-thoughts --to-revision=2
+kubectl rollout undo deployment/ivy-thoughts --to-revision=2 -n ivy
 ```
 
 ## 扩缩容
 
 ```bash
 # 手动扩容
-kubectl scale deployment/ivy-thoughts --replicas=3
+kubectl scale deployment/ivy-thoughts --replicas=3 -n ivy
 
 # 查看副本状态
-kubectl get pods -l app=ivy-thoughts
+kubectl get pods -l app=ivy-thoughts -n ivy
 ```
 
 ## 监控和日志
@@ -129,29 +130,29 @@ kubectl get pods -l app=ivy-thoughts
 
 ```bash
 # 查看 Pods
-kubectl get pods -l app=ivy-thoughts
+kubectl get pods -l app=ivy-thoughts -n ivy
 
 # 查看详细信息
-kubectl describe pod <pod-name>
+kubectl describe pod <pod-name> -n ivy
 ```
 
 ### 查看日志
 
 ```bash
 # 查看某个 Pod 的日志
-kubectl logs <pod-name>
+kubectl logs <pod-name> -n ivy
 
 # 实时查看日志
-kubectl logs -f <pod-name>
+kubectl logs -f <pod-name> -n ivy
 
 # 查看所有副本的日志
-kubectl logs -l app=ivy-thoughts --all-containers=true
+kubectl logs -l app=ivy-thoughts --all-containers=true -n ivy
 ```
 
 ### 进入容器
 
 ```bash
-kubectl exec -it <pod-name> -- /bin/sh
+kubectl exec -it <pod-name> -n ivy -- /bin/sh
 ```
 
 ## 健康检查
@@ -165,12 +166,11 @@ kubectl exec -it <pod-name> -- /bin/sh
 
 ```bash
 # 删除所有资源
-kubectl delete -f k8s/deployment.yaml
-kubectl delete -f k8s/service.yaml
-kubectl delete -f k8s/ingress.yaml
+kubectl delete -f k8s/deployment.yaml -n ivy
+kubectl delete -f k8s/service.yaml -n ivy
 
 # 或使用 Kustomize
-kubectl delete -k k8s/
+kubectl delete -k k8s/ -n ivy
 ```
 
 ## Cloudflare Tunnel 配置
@@ -279,14 +279,14 @@ kubectl logs <pod-name>
 
 ```bash
 # 检查 Service
-kubectl get svc ivy-thoughts
-kubectl describe svc ivy-thoughts
+kubectl get svc ivy-thoughts -n ivy
+kubectl describe svc ivy-thoughts -n ivy
 
 # 检查 Endpoints
-kubectl get endpoints ivy-thoughts
+kubectl get endpoints ivy-thoughts -n ivy
 
 # 测试集群内访问
-kubectl run -it --rm debug --image=busybox --restart=Never -- wget -O- http://ivy-thoughts
+kubectl run -it --rm debug --image=busybox --restart=Never -n ivy -- wget -O- http://ivy-thoughts
 ```
 
 ### Cloudflare Tunnel 不工作

@@ -33,14 +33,14 @@
 # 1. 获取 K8s API Server 地址
 kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}'
 
-# 2. 创建 ServiceAccount 并获取 Token
-kubectl create serviceaccount github-actions
+# 2. 创建 ServiceAccount 并获取 Token（在 ivy namespace）
+kubectl create serviceaccount github-actions -n ivy
 kubectl create clusterrolebinding github-actions-deployer \
   --clusterrole=cluster-admin \
-  --serviceaccount=default:github-actions
+  --serviceaccount=ivy:github-actions
 
 # 获取 Token（Kubernetes 1.24+）
-kubectl create token github-actions --duration=87600h
+kubectl create token github-actions -n ivy --duration=87600h
 
 # 3. 在 GitHub 仓库添加两个 Secrets
 # Settings → Secrets and variables → Actions

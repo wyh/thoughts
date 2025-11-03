@@ -141,7 +141,7 @@ docker run -d -p 8080:80 ghcr.io/<your-username>/ivy-thoughts:latest
 kubectl apply -k k8s/
 
 # 查看部署状态
-kubectl get pods -l app=ivy-thoughts
+kubectl get pods -l app=ivy-thoughts -n ivy
 ```
 
 ### 通过 Service 访问
@@ -150,7 +150,7 @@ kubectl get pods -l app=ivy-thoughts
 
 ```bash
 # 集群内访问
-curl http://ivy-thoughts
+curl http://ivy-thoughts.ivy.svc.cluster.local
 
 # 通过 Cloudflare Tunnel 访问（推荐）
 # 配置 Cloudflare Tunnel 后，可通过自定义域名访问
