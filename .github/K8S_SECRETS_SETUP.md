@@ -6,48 +6,12 @@
 
 在 GitHub 仓库中需要配置以下 secrets：
 
-- `K8S_TOKEN` - Kubernetes 集群的 kubeconfig 文件（base64 编码）
+- `K8S_SERVER` - Kubernetes API Server 地址（如 `https://k8s.example.com:6443`）
+- `K8S_TOKEN` - ServiceAccount 的访问 Token
 
-## 📋 配置步骤
+## 📋 配置步骤（Server + Token 方式）⭐ 推荐
 
-### 方法 1: 使用完整的 kubeconfig 文件（推荐）
-
-#### 1. 获取 kubeconfig 文件
-
-```bash
-# 查看你的 kubeconfig 文件
-cat ~/.kube/config
-
-# 或者从 K8s 集群导出特定的配置
-kubectl config view --minify --flatten
-```
-
-#### 2. Base64 编码 kubeconfig
-
-```bash
-# 对 kubeconfig 进行 base64 编码
-cat ~/.kube/config | base64 | tr -d '\n'
-
-# 或者使用完整命令
-cat ~/.kube/config | base64 -w 0
-```
-
-复制输出的完整字符串。
-
-#### 3. 在 GitHub 添加 Secret
-
-1. 进入你的 GitHub 仓库
-2. 点击 **Settings** → **Secrets and variables** → **Actions**
-3. 点击 **New repository secret**
-4. 名称: `K8S_TOKEN`
-5. 值: 粘贴刚才复制的 base64 编码的字符串
-6. 点击 **Add secret**
-
-### 方法 2: 使用 Server + Token 方式
-
-如果你想使用单独的 K8s API Server 地址和 Token：
-
-#### 1. 获取 K8s API Server 地址
+### 1. 获取 K8s API Server 地址
 
 ```bash
 # 查看 API Server 地址
@@ -57,7 +21,7 @@ kubectl cluster-info | grep 'Kubernetes control plane'
 kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}'
 ```
 
-#### 2. 创建 ServiceAccount 和获取 Token
+### 2. 创建 ServiceAccount 和获取 Token
 
 ```bash
 # 创建 ServiceAccount

@@ -84,20 +84,23 @@ jobs:
 
       - name: Configure kubectl
         run: |
-          # 配置 kubectl 连接到 K8s 集群
-          mkdir -p $HOME/.kube
-          echo "${{ secrets.K8S_TOKEN }}" | base64 -d > $HOME/.kube/config
+          # 使用 server + token 方式配置 kubectl
+          kubectl config set-cluster k8s-cluster \
+            --server=${{ secrets.K8S_SERVER }} \
+            --insecure-skip-tls-verify=true
 
-          # 或使用 server + token 方式
-          # kubectl config set-cluster k8s-cluster \
-          #   --server=${{ secrets.K8S_SERVER }} \
-          #   --insecure-skip-tls-verify=true
-          # kubectl config set-credentials github-actions \
-          #   --token=${{ secrets.K8S_TOKEN }}
-          # kubectl config set-context default \
-          #   --cluster=k8s-cluster \
-          #   --user=github-actions
-          # kubectl config use-context default
+          kubectl config set-credentials github-actions \
+            --token=${{ secrets.K8S_TOKEN }}
+
+          kubectl config set-context default \
+            --cluster=k8s-cluster \
+            --user=github-actions \
+            --namespace=default
+
+          kubectl config use-context default
+
+          # 验证连接
+          kubectl version --short || kubectl version
 
       - name: Deploy to Kubernetes
         run: |
