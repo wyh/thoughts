@@ -1,5 +1,5 @@
 baseURL = 'https://blog.vmsci.com'
-languageCode = 'zh-cn'
+locale = 'zh-cn'
 title = 'Thoughts'
 theme = 'PaperMod'
 
