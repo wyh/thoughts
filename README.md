@@ -94,14 +94,11 @@ docker-compose down
 **推送到 main 分支：**
 
 1. ✅ 构建 Docker 镜像
-2. ✅ 推送到 GitHub Container Registry
-3. 镜像地址: `ghcr.io/<your-username>/ivy-thoughts:latest`
-
-**创建版本 tag（如 v1.0.0）：**
-
-1. ✅ 构建 Docker 镜像
-2. ✅ 推送到 GitHub Container Registry
+2. ✅ 推送到 GitHub Container Registry（`latest` 和本次 commit SHA）
 3. ✅ **自动部署到 Kubernetes**（需要配置 K8S_SERVER 和 K8S_TOKEN）
+4. 镜像地址: `ghcr.io/<your-username>/ivy-thoughts:latest`
+
+**Pull Request：** 只构建镜像，不推送、不部署。
 
 📖 配置自动部署：
 

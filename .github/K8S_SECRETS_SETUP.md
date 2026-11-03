@@ -199,11 +199,10 @@ kubectl auth can-i get pods -l app=ivy-thoughts
 
 ### 测试 GitHub Actions
 
-1. 创建一个测试 tag：
+1. 推送到 main：
 
 ```bash
-git tag v0.0.1-test
-git push origin v0.0.1-test
+git push origin main
 ```
 
 2. 查看 GitHub Actions 运行情况：
@@ -211,13 +210,6 @@ git push origin v0.0.1-test
    - 访问 `https://github.com/YOUR_USERNAME/thoughts/actions`
    - 查看 workflow 执行日志
    - 检查是否有错误
-
-3. 删除测试 tag：
-
-```bash
-git tag -d v0.0.1-test
-git push origin :refs/tags/v0.0.1-test
-```
 
 ## 🔧 故障排查
 
@@ -264,24 +256,20 @@ cat ~/.kube/config | base64 -w 0
 配置完成后，完整的部署流程是：
 
 ```bash
-# 1. 开发和测试代码
+# 1. 提交并推送到 main（触发构建和部署）
 git add .
 git commit -m "feat: add new feature"
 git push origin main
 
-# 2. 创建版本 tag（触发部署）
-git tag v1.0.0
-git push origin v1.0.0
-
-# 3. GitHub Actions 自动执行：
+# 2. GitHub Actions 自动执行：
 #    ✅ 构建 Docker 镜像
-#    ✅ 推送到 ghcr.io
-#    ✅ 部署到 Kubernetes（只针对 tag）
+#    ✅ 推送到 ghcr.io（latest 和本次 commit SHA）
+#    ✅ 部署到 Kubernetes
 #    ✅ 验证部署状态
 
-# 4. 检查部署
+# 3. 检查部署
 kubectl get pods -l app=ivy-thoughts
 kubectl get deployment ivy-thoughts
 ```
 
-现在你只需要打 tag，剩下的都会自动完成！🎉
+现在你只需要推送到 main，剩下的都会自动完成！🎉

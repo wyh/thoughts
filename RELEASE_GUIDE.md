@@ -4,26 +4,16 @@
 
 ## 📦 镜像 Tag 策略
 
-### 自动生成的 Tags
+推送到 `main` 时，GitHub Actions 会构建镜像并打上这些 tag：
 
-当你推送代码或创建 tag 时，GitHub Actions 会自动构建镜像并打上相应的 tag：
-
-| 操作               | 生成的 Tags         | 适用场景      |
-| ------------------ | ------------------- | ------------- |
-| 推送到 `main` 分支 | `latest`, `main`    | 开发/测试环境 |
-| 创建 tag `v1.2.3`  | `1.2.3`, `1.2`, `1` | 生产环境      |
-| 创建 PR            | `pr-123`            | PR 预览       |
-| 推送到其他分支     | `branch-name`       | 功能开发      |
-
-### Tag 使用建议
-
-- 🟢 **开发环境**: 使用 `latest` - 自动获取最新代码
-- 🟡 **测试环境**: 使用 `1.2` - 跟踪特定次版本
-- 🔴 **生产环境**: 使用 `1.2.3` - 锁定具体版本
+| 操作               | 生成的 Tags              | 说明                         |
+| ------------------ | ------------------------ | ---------------------------- |
+| 推送到 `main` 分支 | `latest`、`main`、commit SHA | 构建、推送，并部署到 Kubernetes |
+| 创建 PR            | `pr-123`                 | 只构建，不推送、不部署       |
 
 ## ⚙️ 自动部署配置（可选）
 
-如果你想实现打 tag 自动部署到 Kubernetes，需要先配置 GitHub Secrets：
+推送到 `main` 会自动部署到 Kubernetes。先配置 GitHub Secrets：
 
 📖 **详细配置步骤：** [.github/K8S_SECRETS_SETUP.md](../.github/K8S_SECRETS_SETUP.md)
 
@@ -48,92 +38,33 @@ kubectl create token github-actions -n ivy --duration=87600h
 # - K8S_TOKEN: 上面获取的 Token
 ```
 
-配置完成后，推送 tag 即可自动部署！
+配置完成后，推送到 `main` 即可自动部署。
 
 ## 🚀 发布流程
 
-### 方法 1: 日常开发（使用 latest）
-
-适合快速迭代和测试：
+推送到 `main` 即发布。GitHub Actions 会构建镜像、推送到 ghcr.io，并用本次 commit SHA 滚动更新 Kubernetes。
 
 ```bash
-# 1. 提交代码
+# 1. 提交并推送到 main
 git add .
 git commit -m "feat: add new feature"
 git push origin main
 
-# 2. 等待 GitHub Actions 构建完成（约 2-3 分钟）
-
-# 3. 部署到开发环境
-kubectl apply -k k8s/
-
-# 4. 如果使用 latest tag，强制拉取新镜像
-kubectl rollout restart deployment/ivy-thoughts
-
-# 5. 查看部署状态
-kubectl rollout status deployment/ivy-thoughts
-```
-
-### 方法 2: 版本发布（推荐生产环境）⭐ 自动部署
-
-适合生产环境的正式发布，配置后可实现**一键部署**：
-
-```bash
-# 1. 确保代码已合并到 main 分支并测试通过
-git checkout main
-git pull origin main
-
-# 2. 创建版本 tag（遵循 Semantic Versioning）
-git tag v1.0.0
-git push origin v1.0.0
-
-# 3. GitHub Actions 自动执行以下步骤：
+# 2. GitHub Actions 自动执行：
 #    ✅ 构建 Docker 镜像
-#    ✅ 推送到 ghcr.io/wyh/ivy-thoughts:1.0.0
-#    ✅ 自动部署到 Kubernetes（如果配置了 K8S_TOKEN）
+#    ✅ 推送 latest、main 和本次 commit SHA
+#    ✅ 用 commit SHA 部署到 Kubernetes
 #    ✅ 等待滚动更新完成
-#    ✅ 验证部署状态
 
-# 4. 访问 GitHub Actions 查看部署进度
+# 3. 查看进度
 # https://github.com/wyh/thoughts/actions
 
-# 5. 验证部署（可选）
+# 4. 验证部署
 kubectl get pods -l app=ivy-thoughts
 kubectl describe deployment ivy-thoughts
 ```
 
-**🔧 配置自动部署：**
-
-如果还没有配置 Kubernetes 自动部署，请参考：
-
-- [Kubernetes Secrets 配置指南](../.github/K8S_SECRETS_SETUP.md)
-
-配置完成后，只需要 `git push origin v1.0.0`，剩下的全自动！🚀
-
-## 🔢 版本号规范（Semantic Versioning）
-
-遵循 `MAJOR.MINOR.PATCH` 格式：
-
-- **MAJOR** (主版本号): 不兼容的 API 变更
-- **MINOR** (次版本号): 向后兼容的功能新增
-- **PATCH** (修订号): 向后兼容的问题修正
-
-### 示例
-
-```bash
-# 修复 bug
-git tag v1.0.1
-
-# 添加新功能
-git tag v1.1.0
-
-# 重大更新或不兼容变更
-git tag v2.0.0
-
-# 预发布版本
-git tag v1.1.0-beta.1
-git tag v1.1.0-rc.1
-```
+如果还没有配置 Kubernetes 自动部署，请参考 [Kubernetes Secrets 配置指南](.github/K8S_SECRETS_SETUP.md)。配置完成后，只需要 `git push origin main`。
 
 ## 🎯 部署环境配置
 
@@ -219,13 +150,13 @@ curl http://localhost:8080
 - [ ] 代码已合并到 main 分支
 - [ ] 所有测试通过
 - [ ] 更新了 CHANGELOG（如果有）
-- [ ] 确认版本号符合 Semantic Versioning
 
 ### 发布中
 
-- [ ] 创建并推送 git tag
+- [ ] 已推送到 main
 - [ ] GitHub Actions 构建成功
 - [ ] 镜像已推送到 ghcr.io
+- [ ] Kubernetes 滚动更新完成
 
 ### 发布后
 
@@ -303,11 +234,11 @@ kubectl get events --sort-by='.lastTimestamp' | grep ivy-thoughts
 ## 快速命令参考
 
 ```bash
-# 创建版本并发布
-git tag v1.0.0 && git push origin v1.0.0
+# 推送到 main 即发布
+git push origin main
 
-# 更新 K8s 到新版本
-kubectl set image deployment/ivy-thoughts ivy-thoughts=ghcr.io/wyh/ivy-thoughts:1.0.0
+# 手动把 K8s 指到某次提交（一般不需要，workflow 会做）
+kubectl set image deployment/ivy-thoughts ivy-thoughts=ghcr.io/wyh/ivy-thoughts:<commit-sha>
 
 # 查看当前版本
 kubectl get deployment ivy-thoughts -o jsonpath='{.spec.template.spec.containers[0].image}'

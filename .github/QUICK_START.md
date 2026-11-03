@@ -2,7 +2,7 @@
 
 ## 🎯 一句话总结
 
-打 tag 自动部署！配置 2 个 GitHub Secrets，剩下全自动。
+推送到 main 自动部署！配置 2 个 GitHub Secrets，剩下全自动。
 
 ## 🔑 需要配置的 Secrets
 
@@ -59,9 +59,8 @@ kubectl create token github-actions -n ivy --duration=87600h
 ### 4. 完成！测试一下
 
 ```bash
-# 创建测试 tag
-git tag v0.0.1-test
-git push origin v0.0.1-test
+# 推送到 main，触发构建和部署
+git push origin main
 
 # 查看 GitHub Actions
 # 访问: https://github.com/YOUR_USERNAME/thoughts/actions
@@ -75,18 +74,14 @@ kubectl get pods -l app=ivy-thoughts -n ivy
 ### 发布新版本
 
 ```bash
-# 1. 提交代码
+# 提交并推送到 main，即触发构建和部署
 git add .
 git commit -m "feat: awesome feature"
 git push origin main
 
-# 2. 打 tag（触发自动部署）
-git tag v1.0.0
-git push origin v1.0.0
-
-# 3. 完成！GitHub Actions 会自动：
+# GitHub Actions 会自动：
 #    ✅ 构建镜像
-#    ✅ 推送到 ghcr.io
+#    ✅ 推送到 ghcr.io（latest 和本次 commit SHA）
 #    ✅ 部署到 K8s
 #    ✅ 验证部署状态
 ```
@@ -118,11 +113,11 @@ kubectl create token github-actions --duration=87600h
 
 ### Q: 只想构建镜像，不想部署怎么办？
 
-A: 推送到 main 分支即可，只有 **打 tag** 才会触发部署。
+A: 开 Pull Request。推送到 **main** 会构建并部署，PR 只构建、不推送、不部署。
 
 ```bash
-git push origin main        # ✅ 构建 + 推送，不部署
-git push origin v1.0.0      # ✅ 构建 + 推送 + 部署
+git push origin feature-branch   # 开 PR：只构建
+git push origin main             # 构建 + 推送 + 部署
 ```
 
 ### Q: 部署失败了怎么办？
@@ -182,7 +177,7 @@ EOF
 配置一次，终身受益。从此发布新版本只需要：
 
 ```bash
-git tag v1.0.0 && git push origin v1.0.0
+git push origin main
 ```
 
 剩下的全自动！🚀
